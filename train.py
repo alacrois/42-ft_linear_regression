@@ -1,4 +1,4 @@
-# import matplotlib.pylot as plt
+import matplotlib.pyplot as plt
 
 f = open('thetas', 'r')
 lines = f.read().split('\n')
@@ -12,6 +12,7 @@ def pe(km):
 data = []
 dataX = []
 dataY = []
+
 learningRatio = 0.1
 f = open('data.csv', 'r')
 lines = f.read().split('\n')
@@ -28,9 +29,11 @@ minY = min(dataY)
 maxY = max(dataY)
 minX = min(dataX)
 maxX = max(dataX)
+dataX_normalized = []
+dataY_normalized = []
 for i in range(len(data)):
-    dataX[i] = (dataX[i] - minX) / (maxX - minX)
-    dataY[i] = (dataY[i] - minY) / (maxY - minY)
+    dataX_normalized.append((dataX[i] - minX) / (maxX - minX))
+    dataY_normalized.append((dataY[i] - minY) / (maxY - minY))
 
 def cost(a, b):
     error = 0
@@ -81,14 +84,15 @@ iterations = 500
 # tmp_t0 = t0
 # tmp_t1 = t1
 
-t0 = 10000
-t1 = -0.03
+# t0 = 10000
+# t1 = -0.03
 
 print("Starting...  t0 = " + str(t0) + "  t1 = " + str(t1) + "\n")
 print("cost(t1, t0) = " + str(cost(t1, t0)) + "\n")
 
 
-learning_rate = 0.000000000015
+# learning_rate = 0.000000000015
+learning_rate = 0.0000000001
 for every in range(iterations):
     tmp_t0 = t0
     tmp_t1 = t1
@@ -102,8 +106,13 @@ for every in range(iterations):
     print("cost(t1, t0) = " + str(cost(t1, t0)) + "\n")
     # learning_rate = learning_rate / 2
 
-
-# plt.scatter(data)
+predictions = []
+for i in range(len(dataX)) :
+    predictions.append(t0 + t1 * dataX[i])
+plt.scatter(dataX, dataY)
+plt.scatter(dataX_normalized, dataY_normalized)
+plt.plot(dataX, predictions, c='r')
+plt.show()
 print("Finished " + str(iterations) + " iterations ! ==> t0 = " + str(t0) + "  t1 = " + str(t1))
 
 # for i in range(len(data)):
