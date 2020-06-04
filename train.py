@@ -70,10 +70,14 @@ def denormalize_data(dataX_range, dataY_range):
         dataX[i] = dataX[i] * dataX_range
         dataY[i] = dataY[i] * dataY_range
 
+def debug_gradient_values(dca, dcb, c, i):
+    print("Iteration " + str(i) + " : cost = " + str(c) + " & dca = " + str(dca) + " & dcb = " + str(dcb))
+
 # ===================== Initialization =====================
 normalize = True
 display_p = False
-display_g = True
+display_g = False
+debug_gradient = True
 starting_cost = cost(t1, t0)
 dataX_range = max(dataX) - min(dataX)
 dataY_range = max(dataY) - min(dataY)
@@ -93,10 +97,12 @@ print("cost(t1, t0) = " + str(starting_cost) + "\n")
 for every in range(iterations):
     tmp_t0 = t0
     tmp_t1 = t1
-    # print("der_cost_a(tmp_t1, tmp_t0) = " + str(der_cost_a(tmp_t1, tmp_t0)))
-    # print("der_cost_b(tmp_t1, tmp_t0) = " + str(der_cost_b(tmp_t1, tmp_t0)))
     t1 = t1 - learning_rate * der_cost_a(tmp_t1, tmp_t0)
     t0 = t0 - learning_rate * der_cost_b(tmp_t1, tmp_t0)
+    if debug_gradient == True:
+        debug_gradient_values(der_cost_a(tmp_t1, tmp_t0), der_cost_b(tmp_t1, tmp_t0), cost(t1, t0), every)
+    # print("der_cost_a(tmp_t1, tmp_t0) = " + str(der_cost_a(tmp_t1, tmp_t0)))
+    # print("der_cost_b(tmp_t1, tmp_t0) = " + str(der_cost_b(tmp_t1, tmp_t0)))
     # print("One iterations done ==> t0 = " + str(t0) + " & t1 = " + str(t1))
     # print("cost(t1, t0) = " + str(cost(t1, t0)) + "\n")
     if every == 1 or every == int(iterations**0.5) or every == iterations - 1:
