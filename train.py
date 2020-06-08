@@ -61,30 +61,37 @@ def display_predictions(t0, t1):
     print("")
 
 def normalize_data(dataX_range, dataY_range):
+    global t0, t1, dataX, dataY
+    t0 = t0 / (dataY_range)
+    t1 = t1 / (dataY_range / dataX_range)
     for i in range(len(dataX)):
         dataX[i] = dataX[i] / dataX_range
         dataY[i] = dataY[i] / dataY_range
 
 def denormalize_data(dataX_range, dataY_range):
+    global t0, t1, dataX, dataY
+    t0 = t0 * (dataY_range)
+    t1 = t1 * (dataY_range / dataX_range)
     for i in range(len(dataX)):
         dataX[i] = dataX[i] * dataX_range
         dataY[i] = dataY[i] * dataY_range
 
 def debug_gradient_values(dca, dcb, c, i):
-    print("Iteration " + str(i) + " : cost = " + str(c) + " & dca = " + str(dca) + " & dcb = " + str(dcb))
+    print("Iteration " + str(i) + " : cost = " + str(c) + " & t0 = " + str(t0) + " & t1 = " + str(t1) + \
+            " & dca = " + str(dca) + " & dcb = " + str(dcb))
 
 def slow_learning(learning_rate):
     return learning_rate * 0.1
 
 def speed_up_learning(learning_rate):
-    return learning_rate * 1.1
+    return learning_rate * 1.05
 
 # ===================== Initialization =====================
-normalize = False
-display_p = False
+normalize = True
+display_p = True
 display_g = True
 debug_gradient = True
-adjust_learning_rate = False
+adjust_learning_rate = True
 starting_cost = cost(dataX, dataY, t1, t0)
 dataX_range = max(dataX) - min(dataX)
 dataY_range = max(dataY) - min(dataY)
@@ -93,11 +100,12 @@ if (normalize == True):
 cost_history = []
 cost_history_size = 3
 all_predictions = []
-iterations = 100
-learning_rate = 0.000000000015
+iterations = 500
+# Best learning rate for raw data (not normalized) :
+# learning_rate = 0.000000000015
 # learning_rate = 0.0000000001
 # learning_rate = 0.0001
-# learning_rate = 0.5
+learning_rate = 0.1
 
 print("starting t0 = " + str(t0) + "\nstarting t1 = " + str(t1))
 print("cost(t1, t0) = " + str(starting_cost) + "\n")
@@ -110,6 +118,9 @@ for iteration in range(iterations):
     dcb = der_cost_b(dataX, dataY, tmp_t1, tmp_t0)
     t1 = t1 - learning_rate * dca
     t0 = t0 - learning_rate * dcb
+    # t1 = learning_rate * dca
+    # t0 = learning_rate * dcb
+
     c = cost(dataX, dataY, t1, t0)
     if adjust_learning_rate == True :
         # cost_history.insert(0, cost(t1, t0))
@@ -135,7 +146,6 @@ for iteration in range(iterations):
     if debug_gradient == True:
         # debug_gradient_values(dca, dcb, cost(t1, t0), iteration)
         debug_gradient_values(dca, dcb, c, iteration)
-        # ====> DEBUG T0 & T1 TOO !
 
     if iteration == 0 or iteration == int(iterations**0.5) or iteration == iterations - 1:
         all_predictions.append(get_prediction_history_for_graph(t0, t1))
@@ -152,8 +162,8 @@ if display_g == True:
 
 # ===================== Denormalizing =====================
 if normalize == True:
-    t0 = t0 * (dataY_range)
-    t1 = t1 * (dataY_range / dataX_range)
+    # t0 = t0 * (dataY_range)
+    # t1 = t1 * (dataY_range / dataX_range)
     denormalize_data(dataX_range, dataY_range)
 
 # ===================== Displaying some infos =====================
