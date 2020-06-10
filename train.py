@@ -1,24 +1,32 @@
 import matplotlib.pyplot as plt
+import parsing
+import display
+import normalization
 import math
 
 # ===================== Parsing data =====================
-f = open('thetas', 'r')
-lines = f.read().split('\n')
-f.close()
-t0 = float(lines[0])
-t1 = float(lines[1])
+# f = open('thetas', 'r')
+# lines = f.read().split('\n')
+# f.close()
+# t0 = float(lines[0])
+# t1 = float(lines[1])
+t = parsing.read_thetas()
+t0 = t[0]
+t1 = t[1]
 
-dataX = []
-dataY = []
+# dataX = []
+# dataY = []
 
-f = open('data.csv', 'r')
-lines = f.read().split('\n')
-f.close()
-for i in range(1, len(lines)):
-    line = lines[i]
-    if len(line.split(",")) > 1 :
-        dataX.append(float(line.split(",")[0]))
-        dataY.append(float(line.split(",")[1]))
+# f = open('data.csv', 'r')
+# lines = f.read().split('\n')
+# f.close()
+# for i in range(1, len(lines)):
+#     line = lines[i]
+#     if len(line.split(",")) > 1 :
+#         dataX.append(float(line.split(",")[0]))
+#         dataY.append(float(line.split(",")[1]))
+
+dataX, dataY = parsing.read_data()
 
 # ===================== Functions =====================
 def cost(dataX, dataY, a, b):
@@ -167,15 +175,8 @@ if normalize == True:
     denormalize_data(dataX_range, dataY_range)
 
 # ===================== Displaying some infos =====================
-print("Finished " + str(iterations) + " iterations !\n")
-if (display_p == True):
-    display_predictions(t0, t1)
-print("final t0 = " + str(t0))
-print("final t1 = " + str(t1))
-print("cost(t1, t0) = " + str(cost(dataX, dataY, t1, t0)))
+display.end_of_program_output([t0, t1], iterations, cost(dataX, dataY, t1, t0), dataX, display_p)
 
 
 # ===================== Writing new thetas to file =====================
-f = open('thetas', 'w')
-f.write(str(t0) + "\n" + str(t1) + "\n")
-f.close()
+parsing.write_thetas([t0, t1])
