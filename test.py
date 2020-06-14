@@ -1,104 +1,79 @@
-from numpy import *
-import pandas as pd
+import csv
+import sys
+import show
+import argparse
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Important thing, this function is concepted to be global
+def dataset() :
+	try:
+		liste = np.genfromtxt("data.csv", delimiter=",", skip_header=1)
+	except:
+		print('Warning: Failed to load file!\nMake sure data.csv exist.')
+		sys.exit(-1)
+	m = len(liste)
+	x = np.array([1] * m, float)
+	nx = np.array([1] * m, float)
+	Y = np.array([1] * m, float)
+	Theta = np.random.randn(2, 1)
+	for i in range(len(liste)) :
+		if (i < m):
+			x[i] = liste[i][0]
+			nx[i] = liste[i][0]
+			Y[i] = liste[i][1]
+	x = x.reshape(x.shape[0], 1)
+	nx = nx.reshape(nx.shape[0], 1)
+	Y = Y.reshape(Y.shape[0], 1)
+	xmin = np.min(x)
+	xmax = np.max(x)
+	for i in range(len(nx)):
+		nx[i] = (nx[i] - xmin) / (xmax - xmin)
+	normX = np.hstack((nx, np.ones(nx.shape)))
+	return x, normX, Y, Theta
 
-# import our file
-input_file = "data.csv"
-output_file = "teta.txt"
+def model(X, Theta) :
+	F = X.dot(Theta)
+	return F
 
-# load our file to dataset
-try:
-    dataset = pd.read_csv(input_file, delimiter=",", dtype="float")
-except Exception as e:
-    exit(e)
-# Spliting our dataset into 2 separated columns | We begin at 1 so we don't have column name
-X = dataset.iloc[0:len(dataset), 0]
-Y = dataset.iloc[0:len(dataset), 1]
+def cost_function(m, X, Y, Theta) :
+	scal = (1 / (2 * m)) * np.sum((model(X, Theta) - Y)**2)
+	return scal
 
-# Born Definition
+def gradient_descent(X, Y, Theta, learning_rate, n_iterations) :
+	m = len(Y)
+	cost_history = np.array([0] * n_iterations, float)
+	for i in range(0, n_iterations) :
+		Theta = Theta - learning_rate * (1 / m * X.T.dot(model(X, Theta) - Y))
+		cost_history[i] = cost_function(m, X, Y, Theta)
+	return Theta, cost_history
 
-mixY = min(Y)
-maxY = max(Y)
-minX = min(X)
-maxX = max(X)
+def ft_linear_regression() :
+	learning_rate = 0.07
+	n_iterations = 1000
+	x, normX, Y, Theta = dataset()
+	final_Theta, cost_history = gradient_descent(normX, Y, Theta, learning_rate, n_iterations)
 
-x = (X - minX) / (maxX - minX)
-y = (Y - mixY) / (maxY - mixY)
+	prediction = model(normX, final_Theta)
+	return x, Y, prediction, cost_history, final_Theta, n_iterations
 
-# Visu
+def argument_parser() :
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-p", "--prediction", action="count", default=0, help="show the prediction curve")
+	parser.add_argument("-ch", "--cost_history", action="count", default=0, help="show the cost history curve")
+	parser.add_argument("-cd", "--coef_determination", action="count", default=0, help="show the coefficient determination")
+	args = parser.parse_args()
 
-axes = plt.axes()
-axes.grid() # draw grid
+	x, Y, prediction, cost_history, final_Theta, n_iterations = ft_linear_regression()
+	for i in range(len(cost_history)):
+		print(cost_history[i])
 
-# End visu for now
+	if args.prediction >= 1 :
+		show.prediction_curve(x, Y, prediction)
+	elif args.cost_history >= 1 :
+		show.cost_history_curve(n_iterations, cost_history)
+	elif args.coef_determination >= 1 :
+		show.coef_determination(Y, prediction)
+	show.thetas_values(float(final_Theta[1]), float(final_Theta[0]))
 
-# Set our variables
-
-m = len(X)  # M is the number of experience our dataset contain
-alpha_rate = 0.5  # Learning rate - Change value to change algo
-initial_t0 = 0  # use for tmp t0 final value will be used
-initial_t1 = 0  # use for tmp t1 final value will be used
-iteration = 2000  # number of it
-
-# Create true func
-
-
-def launch_gradient_descent():
-    tmp_t0 = 0
-    tmp_t1 = 0
-    for every in range(0, iteration):
-        sum1 = 0
-        sum2 = 0
-        for i in range(0, m):
-            sum1 += ((tmp_t1 * x[i] + tmp_t0) - y[i])
-            sum2 += (((tmp_t1 * x[i] + tmp_t0) - y[i]) * x[i])
-        tmp_t0 = tmp_t0 - (alpha_rate * (sum1 / m))
-        tmp_t1 = tmp_t1 - (alpha_rate * (sum2 / m))
-    return [tmp_t0, tmp_t1]
-
-
-[final_t0, final_t1] = launch_gradient_descent()
-
-
-# End func
-
-# Added for line
-
-def normalize(lstX, x):
-    return (x - min(lstX)) / (max(lstX) - min(lstX))
-
-
-def denormalize(lstX, x):
-    return x * (max(lstX) - min(lstX)) + min(lstX)
-
-
-# End
-
-# Visu print
-
-lx = [minX, maxX]
-ly = []
-for j in lx:
-    j = final_t1 * normalize(X, j) + final_t0
-    price = denormalize(Y, j)
-    ly.append(price)
-
-plt.scatter(X, Y)
-plt.plot(lx, ly, color='red')
-plt.show()
-
-# End of visu
-dataY_range = maxY - mixY
-dataX_range = maxX - minX
-final_t0 = final_t0 * (dataY_range) + mixY
-final_t1 = final_t1 * (dataY_range / dataX_range)
-
-
-# Output in the file
-
-with open(output_file, 'w') as f:
-    f.write(str(final_t0))
-    f.write("\n")
-    f.write(str(final_t1))
+if __name__ == '__main__' :
+	argument_parser()
