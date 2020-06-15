@@ -1,3 +1,5 @@
+import numpy as np
+
 # def normalize_data(dataX_range, dataY_range):
 #     global t0, t1, dataX, dataY
 #     t0 = t0 / (dataY_range)
@@ -32,10 +34,28 @@ def get_final_thetas(raw_dataX, raw_dataY, thetas, normalize):
                     thetas[1] * (dataY_range / dataX_range)]
     return final_thetas
 
-def denormalize_data(dataX_range, dataY_range):
-    global t0, t1, dataX, dataY
-    t0 = t0 * (dataY_range)
-    t1 = t1 * (dataY_range / dataX_range)
-    for i in range(len(dataX)):
-        dataX[i] = dataX[i] * dataX_range
-        dataY[i] = dataY[i] * dataY_range
+def get_final_theta(raw_dataX, raw_dataY, theta, normalize):
+    # print("Grrrr theta = " + str(theta))
+    if normalize == False:
+        return theta
+    dataX_range = max(raw_dataX) - min(raw_dataX)
+    dataY_range = max(raw_dataY) - min(raw_dataY)
+    theta[0][0] = theta[0][0] * (dataY_range / dataX_range)
+    theta[1][0] = theta[1][0] * dataY_range
+    # final_theta = [theta[1][0] * dataY_range, \
+    #                 theta[0][0] * (dataY_range / dataX_range)]
+    return theta
+
+def denormalize(raw_dataX, raw_dataY, X, Y, theta, normalize):
+    if normalize == False:
+        return X, Y, theta
+    dataX_range = max(raw_dataX) - min(raw_dataX)
+    dataY_range = max(raw_dataY) - min(raw_dataY)
+    theta[0][0] = theta[0][0] * (dataY_range / dataX_range)
+    theta[1][0] = theta[1][0] * dataY_range
+    # print("X before :" + str(X))
+    X[:,0] = X[:,0] * dataX_range
+    # print("X after :" + str(X))
+
+    Y = Y * dataY_range
+    return X, Y, theta
