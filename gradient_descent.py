@@ -4,12 +4,13 @@ def model(X, theta):
     return X.dot(theta)
 
 def cost_function(X, Y, theta):
-    m = len(Y)
+    # print("X = " + str(X) + "\nY = " + str(Y) + "\ntheta = " + str(theta))
+    m = float(len(Y))
     s = (1 / (2 * m)) * np.sum((model(X, theta) - Y)**2)
     return s
 
 def gradient(X, Y, theta):
-    m = len(Y)
+    m = float(len(Y))
     return (1 / m) * X.T.dot(model(X, theta) - Y)
 
 def slow_learning(learning_rate):
@@ -35,7 +36,7 @@ def adjust_learning_rate(learning_rate, X, Y, theta, previous_theta, cost_histor
                 print("Learning rate slowed at iteration " + str(iteration) + " ! (len(ch) = " + str(len(cost_history)) + ")  lr = " + str(learning_rate))
             learning_rate = slow_learning(learning_rate)
             theta = previous_theta
-            cost_history.clear()
+            del cost_history[:]
         else :
             learning_rate = speed_up_learning(learning_rate)
     return learning_rate, theta, cost_history
