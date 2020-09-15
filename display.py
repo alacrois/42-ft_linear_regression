@@ -24,7 +24,7 @@ def end_output(theta, cost, X, Display_predictions):
     if (Display_predictions == True):
         print("Model predictions :")
         print(X.dot(theta))
-    print("\nFinal t0 = " + str(theta[1][0]))
+    print("Final t0 = " + str(theta[1][0]))
     print("Final t1 = " + str(theta[0][0]))
     print("Cost = " + str(cost))
 

@@ -4,7 +4,6 @@ def model(X, theta):
     return X.dot(theta)
 
 def cost_function(X, Y, theta):
-    # print("X = " + str(X) + "\nY = " + str(Y) + "\ntheta = " + str(theta))
     m = float(len(Y))
     s = (1 / (2 * m)) * np.sum((model(X, theta) - Y)**2)
     return s
